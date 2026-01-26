@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a-brick-code-analyzer"
+version = "0.1.0"
+description = "A powerful code analysis tool combining AST parsing, rule engine, and LLM integration"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
