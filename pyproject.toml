@@ -15,3 +15,10 @@ where = ["src"]
 
 [tool.setuptools.package-dir]
 "" = "src"
+
+[project.optional-dependencies]
+javascript = [
+    "tree-sitter",
+    "tree-sitter-javascript",
+    "tree-sitter-typescript"
+]

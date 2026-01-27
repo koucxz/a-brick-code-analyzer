@@ -89,6 +89,18 @@ def example_factory_usage():
     print(f"\n支持的语言: {ParserFactory.get_supported_languages()}")
     print(f"支持的扩展名: {ParserFactory.get_supported_extensions()}")
 
+    # JavaScript/TypeScript 支持（需要安装可选依赖）
+    js_parser = ParserFactory.get_parser_by_file("example.js")
+    ts_parser = ParserFactory.get_parser_by_file("example.ts")
+
+    if js_parser:
+        print(f"JavaScript 解析器可用: {js_parser.__class__.__name__}")
+    if ts_parser:
+        print(f"TypeScript 解析器可用: {ts_parser.__class__.__name__}")
+
+    if not js_parser and not ts_parser:
+        print("提示: 安装 JavaScript/TypeScript 支持: pip install -e .[javascript]")
+
 
 def example_complexity_analysis():
     """复杂度分析示例"""

@@ -9,6 +9,13 @@ from typing import Optional
 from .base import BaseParser
 from .python_parser import PythonParser
 
+# 可选的 JavaScript/TypeScript 支持
+try:
+    from .javascript_parser import JavaScriptParser, TypeScriptParser
+    JAVASCRIPT_SUPPORT = True
+except ImportError:
+    JAVASCRIPT_SUPPORT = False
+
 
 class ParserFactory:
     """解析器工厂类"""
@@ -22,6 +29,19 @@ class ParserFactory:
     _extension_map = {
         '.py': 'python',
     }
+
+    # 动态注册 JavaScript/TypeScript 解析器（如果可用）
+    if JAVASCRIPT_SUPPORT:
+        _parsers.update({
+            'javascript': JavaScriptParser,
+            'typescript': TypeScriptParser,
+        })
+        _extension_map.update({
+            '.js': 'javascript',
+            '.jsx': 'javascript',
+            '.ts': 'typescript',
+            '.tsx': 'typescript',
+        })
 
     @classmethod
     def get_parser(cls, language: str) -> Optional[BaseParser]:
