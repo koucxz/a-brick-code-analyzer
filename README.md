@@ -93,6 +93,119 @@ JavaScript 和 TypeScript 解析器支持以下功能：
 - **行数统计**: 详细的代码行、注释行、空白行统计
 - **错误处理**: 优雅处理语法错误
 
+## 规则引擎
+
+规则引擎提供 ESLint 风格的代码质量检查功能。
+
+### 基础使用
+
+```python
+from a_brick_code_analyzer import RuleEngine, PythonParser, Severity
+
+# 创建规则引擎
+engine = RuleEngine()
+engine.register_builtin_rules()
+engine.use_preset('recommended')  # 使用推荐预设
+
+# 检查代码
+parser = PythonParser()
+code = '''
+def BadFunctionName(a, b, c, d, e, f, g):
+    if a:
+        if b:
+            if c:
+                return d
+    return 0
+'''
+parse_result = parser.parse(code, "example.py")
+result = engine.lint(parse_result)
+
+# 输出结果
+print(f"错误: {result.error_count}, 警告: {result.warning_count}")
+for violation in result.violations:
+    print(f"  行 {violation.line_start}: [{violation.rule_id}] {violation.message}")
+```
+
+### 内置规则
+
+| 规则 ID | 描述 | 默认选项 |
+|---------|------|----------|
+| `complexity/max-complexity` | 最大圈复杂度 | `{max: 10}` |
+| `complexity/max-function-lines` | 函数最大行数 | `{max: 50}` |
+| `complexity/max-params` | 最大参数数量 | `{max: 5}` |
+| `naming/function-naming` | 函数命名规范 | `{style: "snake_case"}` |
+| `naming/class-naming` | 类命名规范 | `{style: "PascalCase"}` |
+| `structure/max-file-lines` | 文件最大行数 | `{max: 500}` |
+| `structure/max-classes-per-file` | 每文件最大类数量 | `{max: 5}` |
+| `structure/max-functions-per-file` | 每文件最大函数数量 | `{max: 20}` |
+
+### 预设配置
+
+- **recommended**: 推荐配置，平衡的规则设置
+- **strict**: 严格配置，所有规则为 ERROR 级别，阈值更低
+- **minimal**: 最小配置，仅包含关键规则
+
+### 自定义配置
+
+#### 代码中配置
+
+```python
+engine = RuleEngine()
+engine.register_builtin_rules()
+engine.use_preset('recommended')
+
+# 修改规则配置
+engine.configure_rule(
+    'complexity/max-complexity',
+    severity=Severity.ERROR,
+    options={'max': 8}
+)
+
+# 禁用规则
+engine.configure_rule('naming/function-naming', severity=Severity.OFF)
+```
+
+#### 配置文件
+
+支持 `.analyzerrc.json`、`.analyzerrc.yaml` 或 `pyproject.toml` 配置：
+
+**`.analyzerrc.json`**
+```json
+{
+  "extends": ["recommended"],
+  "rules": {
+    "complexity/max-complexity": ["error", { "max": 10 }],
+    "complexity/max-function-lines": ["warn", { "max": 50 }],
+    "naming/function-naming": "off"
+  },
+  "ignorePatterns": ["**/node_modules/**", "**/__pycache__/**"]
+}
+```
+
+**`pyproject.toml`**
+```toml
+[tool.analyzer]
+extends = ["recommended"]
+
+[tool.analyzer.rules]
+"complexity/max-complexity" = ["error", { max = 10 }]
+"naming/function-naming" = "off"
+```
+
+### 检查目录
+
+```python
+engine = RuleEngine()
+engine.register_builtin_rules()
+engine.load_config()  # 自动加载配置文件
+
+# 检查整个目录
+report = engine.lint_directory("src/", recursive=True)
+
+print(f"检查了 {report.total_files} 个文件")
+print(f"总计: {report.total_errors} 错误, {report.total_warnings} 警告")
+```
+
 ## 运行示例
 
 ### 基础示例（Python）
@@ -109,6 +222,11 @@ pip install -e .[javascript]
 python examples/js_ts_example.py
 ```
 
+### 规则引擎示例
+```bash
+python examples/rules_example.py
+```
+
 ## 运行测试
 
 ```bash
@@ -117,7 +235,7 @@ python -m pytest
 
 ## TODO
 
-- [ ] 规则引擎：可自定义的代码质量规则
+- [x] 规则引擎：可自定义的代码质量规则
 - [ ] LLM 集成：AI 驱动的代码洞察
 - [ ] 安全检测：识别潜在的安全漏洞
 - [ ] 性能分析：提供优化建议
