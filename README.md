@@ -227,6 +227,162 @@ python examples/js_ts_example.py
 python examples/rules_example.py
 ```
 
+### LLM 代码分析示例
+
+#### 1. 安装 Ollama
+
+访问 https://ollama.com/download 下载并安装 Ollama。
+
+#### 2. 下载模型
+
+```bash
+ollama pull qwen3-coder
+```
+
+推荐模型（2025 年更新）：
+
+| 模型 | 参数量 | 说明 |
+|------|--------|------|
+| `qwen3-coder` | 30B | **代码首选**，效果最好，需 24GB+ 显存 |
+| `deepseek-r1` | 7.6B | 推理能力强，支持中文，性价比高 |
+| `qwen3` | 4B/8B | 通用模型，支持思考链 |
+| `codellama:7b` | 7B | 经典代码模型 |
+| `llama3.2:3b` | 3B | 轻量快速，入门推荐 |
+| `deepseek-coder-v2` | 16B | 代码专用，支持中文 |
+
+> 💡 显存充足首选 `qwen3-coder`，显存有限用 `deepseek-r1` 或 `llama3.2:3b`
+
+#### 3. 运行示例
+
+```bash
+python examples/llm_example.py
+```
+
+#### 4. 代码中使用
+
+```python
+from a_brick_code_analyzer import CodeAnalyzer, AnalysisType
+
+# 创建分析器（默认使用 llama3.2:3b）
+analyzer = CodeAnalyzer()
+
+# 或指定更强的模型
+analyzer = CodeAnalyzer(model="qwen3-coder")
+
+code = '''
+def calculate(a, b, c, d, e, f):
+    if a > 0:
+        if b > 0:
+            return a + b
+    return 0
+'''
+
+# 代码审查
+result = analyzer.review(code)
+print(result.content)
+
+# 安全检查
+result = analyzer.check_security(code)
+
+# 代码解释
+result = analyzer.explain(code)
+
+# 复杂度分析
+result = analyzer.analyze_complexity(code)
+
+# 性能优化建议
+result = analyzer.optimize_performance(code)
+
+# 生成文档
+result = analyzer.generate_docs(code)
+```
+
+#### 5. LLM 分析示例
+
+**代码审查示例**
+
+```python
+from a_brick_code_analyzer import CodeAnalyzer
+
+analyzer = CodeAnalyzer()
+
+code = '''
+def calculate_discount(price, discount_type, user_level, is_vip, has_coupon):
+    if discount_type == "percentage":
+        if user_level > 5:
+            if is_vip:
+                if has_coupon:
+                    return price * 0.5
+                else:
+                    return price * 0.6
+            else:
+                return price * 0.7
+        else:
+            return price * 0.9
+    else:
+        return price - 20
+'''
+
+result = analyzer.review(code)
+print(result.content)
+# 输出: 代码问题分析、命名规范建议、重构建议等
+print(f"耗时: {result.duration_ms:.0f}ms, Token: {result.total_tokens}")
+```
+
+**安全检查示例**
+
+```python
+from a_brick_code_analyzer import CodeAnalyzer
+
+analyzer = CodeAnalyzer()
+
+code = '''
+import subprocess
+
+def run_command(user_input):
+    # 危险: 命令注入漏洞
+    result = subprocess.run(user_input, shell=True, capture_output=True)
+    return result.stdout.decode()
+
+def read_file(filename):
+    # 危险: 路径遍历漏洞
+    with open(f"/data/{filename}", "r") as f:
+        return f.read()
+'''
+
+result = analyzer.check_security(code)
+print(result.content)
+# 输出: 识别命令注入、路径遍历等安全漏洞，并提供修复建议
+```
+
+**性能优化示例**
+
+```python
+from a_brick_code_analyzer import CodeAnalyzer
+
+analyzer = CodeAnalyzer()
+
+code = '''
+def find_duplicates(items):
+    duplicates = []
+    for i in range(len(items)):
+        for j in range(i + 1, len(items)):
+            if items[i] == items[j] and items[i] not in duplicates:
+                duplicates.append(items[i])
+    return duplicates
+
+def process_data(data):
+    result = []
+    for item in data:
+        result = result + [item * 2]  # 低效的列表拼接
+    return result
+'''
+
+result = analyzer.optimize_performance(code)
+print(result.content)
+# 输出: 识别 O(n²) 复杂度问题、低效列表操作，提供优化建议
+```
+
 ## 运行测试
 
 ```bash
@@ -236,9 +392,9 @@ python -m pytest
 ## TODO
 
 - [x] 规则引擎：可自定义的代码质量规则
-- [ ] LLM 集成：AI 驱动的代码洞察
-- [ ] 安全检测：识别潜在的安全漏洞
-- [ ] 性能分析：提供优化建议
+- [x] LLM 集成：AI 驱动的代码洞察
+- [x] 安全检测：识别潜在的安全漏洞
+- [x] 性能分析：提供优化建议
 - [x] 支持 JavaScript 和 TypeScript
 - [ ] 支持更多语言（Go 等）
 

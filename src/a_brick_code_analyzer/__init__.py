@@ -1,6 +1,6 @@
 """
 AST 解析模块
-提供代码解析、结构分析和规则引擎功能
+提供代码解析、结构分析、规则引擎和 LLM 集成功能
 """
 
 from .base import BaseParser, ParseResult, NodeType, CodeNode
@@ -15,6 +15,15 @@ from .rules import (
     RuleViolation,
     LintResult,
     LintReport,
+)
+from .llm import (
+    CodeAnalyzer,
+    OllamaClient,
+    LLMConfig,
+    LLMResponse,
+    AnalysisType,
+    RECOMMENDED_MODELS,
+    select_model_interactive,
 )
 
 __all__ = [
@@ -35,4 +44,13 @@ __all__ = [
     'RuleViolation',
     'LintResult',
     'LintReport',
+
+    # LLM 集成
+    'CodeAnalyzer',
+    'OllamaClient',
+    'LLMConfig',
+    'LLMResponse',
+    'AnalysisType',
+    'RECOMMENDED_MODELS',
+    'select_model_interactive',
 ]
